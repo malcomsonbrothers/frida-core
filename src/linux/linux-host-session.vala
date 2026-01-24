@@ -1116,6 +1116,10 @@ namespace Frida {
 			return
 				"boot.art" in path ||
 				"boot-framework.art" in path ||
+				"boot.vdex" in path ||
+				"boot-framework.vdex" in path ||
+				"boot.oat" in path ||
+				"boot-framework.oat" in path ||
 				"dalvik-LinearAlloc" in path;
 		}
 
