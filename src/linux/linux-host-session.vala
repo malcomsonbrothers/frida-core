@@ -938,6 +938,12 @@ namespace Frida {
 			string? runtime_path = null;
 			Gee.List<Gum.MemoryRange?> heap_candidates = new Gee.ArrayList<Gum.MemoryRange?> ();
 
+			// Track previous region to find anonymous regions before boot.oat (Android 15+)
+			uint64 prev_start = 0;
+			uint64 prev_end = 0;
+			string prev_flags = "";
+			string prev_path = "";
+
 			var iter = ProcMapsIter.for_pid (pid);
 			while (iter.next ()) {
 				string path = iter.path;
@@ -962,6 +968,19 @@ namespace Frida {
 						size = (size_t) (end - start),
 					});
 				}
+
+				// Android 15+: anonymous rw-p region immediately before boot.oat contains method slots
+				if (path.has_suffix ("/boot.oat") && prev_flags == "rw-p" && prev_path == "" && prev_end == iter.start_address) {
+					heap_candidates.add (Gum.MemoryRange () {
+						base_address = prev_start,
+						size = (size_t) (prev_end - prev_start),
+					});
+				}
+
+				prev_start = iter.start_address;
+				prev_end = iter.end_address;
+				prev_flags = flags;
+				prev_path = path;
 			}
 
 			if (payload_base == 0)
