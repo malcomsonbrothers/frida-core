@@ -954,7 +954,7 @@ namespace Frida {
 				} else if (path.has_suffix ("/libandroid_runtime.so")) {
 					if (runtime_path == null)
 						runtime_path = path;
-				} else if (flags == "rw-p" && is_boot_heap (path)) {
+				} else if ((flags == "rw-p" || flags == "r--p") && is_boot_heap (path)) {
 					uint64 start = iter.start_address;
 					uint64 end = iter.end_address;
 					heap_candidates.add (Gum.MemoryRange () {
