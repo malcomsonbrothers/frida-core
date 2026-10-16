@@ -1,0 +1,9 @@
+#!/bin/sh
+# >>> org-checks pre-push guards >>>
+# Added by org-checks scripts/install-hooks.sh; re-run it to update .githooks/org/.
+org_refs=$(mktemp) || exit 1
+cat > "$org_refs"
+bash "$(git rev-parse --show-toplevel)/.githooks/org/pre-push-guards.sh" "$@" < "$org_refs" || { rm -f "$org_refs"; exit 1; }
+exec < "$org_refs"
+rm -f "$org_refs"
+# <<< org-checks pre-push guards <<<
